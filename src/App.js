@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Main from './components/Main';
 import ProtectedRoute from './components/ProtectedRoute';
 
+
 function App() {
   return (
     <Router>
@@ -18,6 +19,8 @@ function App() {
           }
         />
         <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Catch all non-matching routes and redirect to login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
