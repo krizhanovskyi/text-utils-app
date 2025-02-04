@@ -18,20 +18,11 @@ function Main() {
   const [useSpecialChars, setUseSpecialChars] = useState(false);
   const [generatedPasswords, setGeneratedPasswords] = useState('');
   const [passwordCopyStatus, setPasswordCopyStatus] = useState('');
-  const [base64Input, setBase64Input] = useState('');
-  const [base64Output, setBase64Output] = useState('');
-  const [base64Mode, setBase64Mode] = useState('encode');
-  const [base64CopyStatus, setBase64CopyStatus] = useState('');
 
   // Language character ranges
   const langRanges = {
     latin: /[a-zA-Z]/,  // Only Latin letters
     cyrillic: /[а-яА-ЯёЁїЇіІєЄґҐ]/  // Combined Ukrainian and Russian letters
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    navigate('/login');
   };
 
   const handleProcessText = () => {
@@ -147,30 +138,6 @@ function Main() {
     }
   };
 
-  const handleBase64Process = () => {
-    try {
-      if (base64Mode === 'encode') {
-        const encoded = btoa(base64Input);
-        setBase64Output(encoded);
-      } else {
-        const decoded = atob(base64Input);
-        setBase64Output(decoded);
-      }
-    } catch (error) {
-      setBase64Output('Error: Invalid input for ' + base64Mode);
-    }
-  };
-
-  const handleCopyBase64 = async () => {
-    try {
-      await navigator.clipboard.writeText(base64Output);
-      setBase64CopyStatus('Copied!');
-      setTimeout(() => setBase64CopyStatus(''), 2000);
-    } catch (err) {
-      setBase64CopyStatus('Failed to copy');
-    }
-  };
-
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Top Navigation Panel */}
@@ -184,7 +151,17 @@ function Main() {
       }}>
         {/* Left side - Brand and Navigation Links */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
-          <h2 style={{ margin: 0, color: 'black'}}>Application</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              style={{ 
+                height: '30px',
+                width: 'auto'
+              }}
+            />
+            <h2 style={{ margin: 0, color: 'black'}}> </h2>
+          </div>
           
           {/* Navigation Links */}
           <div style={{ display: 'flex', gap: '20px' }}>
@@ -194,71 +171,49 @@ function Main() {
               borderRadius: '4px',
               cursor: 'pointer'
             }}>
-              Main
+              Text Utils
             </div>
             <div style={{
               padding: '8px 15px',
               cursor: 'pointer',
               transition: 'background-color 0.2s',
-              color: 'black'
+              color: 'black',
+              borderRadius: '4px'
             }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#34495e'}
-            onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}>
-
-              Profile
+            onClick={() => navigate('/json')}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#34495e';
+              e.target.style.color = 'white';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = 'black';
+            }}>
+              JSON to Excel
             </div>
             <div style={{
               padding: '8px 15px',
               cursor: 'pointer',
               transition: 'background-color 0.2s',
-              color: 'black'
+              color: 'black',
+              borderRadius: '4px'
             }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#34495e'}
-            onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}>
-              Settings
+            onClick={() => navigate('/base64')}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#34495e';
+              e.target.style.color = 'white';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = 'black';
+            }}>
+              Base64
             </div>
           </div>
         </div>
 
-        {/* Right side - Profile and Logout */}
+        {/* Right side - Logout */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '10px',
-            color: '#050533'
-          }}>
-            <div style={{
-              width: '35px',
-              height: '35px',
-              backgroundColor: '#050533',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: 'bold'
-            }}>
-              A
-            </div>
-            <span>Admin</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: '8px 15px',
-              backgroundColor: '#e74c3c',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#c0392b'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#e74c3c'}
-          >
-            Logout
-          </button>
         </div>
       </div>
 
@@ -560,7 +515,7 @@ function Main() {
         </div>
       </div>
 
-      {/* Container for Password Generator and Base64 sections */}
+      {/* Container for Password Generator */}
       <div style={{ 
         display: 'flex', 
         gap: '20px', 
@@ -736,153 +691,6 @@ function Main() {
                   fontSize: '14px'
                 }}>
                   {passwordCopyStatus}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Base64 Encode/Decode Section */}
-        <div style={{ 
-          padding: '20px', 
-          width: '600px',
-          border: '1px solid #ced4da',
-          borderRadius: '8px',
-          backgroundColor: 'white',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-        }}>
-          <h3 style={{ 
-            margin: '0 0 20px 0',
-            padding: '0 0 10px 0',
-            borderBottom: '1px solid #ced4da',
-            color: '#050533'
-          }}>
-            Base64 Encode/Decode
-          </h3>
-
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              color: '#495057',
-              fontWeight: '500'
-            }}>
-              Input Text
-            </label>
-            <textarea
-              value={base64Input}
-              onChange={(e) => setBase64Input(e.target.value)}
-              placeholder="Enter text to encode or decode"
-              style={{
-                width: '100%',
-                padding: '10px',
-                height: '100px',
-                borderRadius: '4px',
-                border: '1px solid #ced4da',
-                marginBottom: '10px',
-                resize: 'none',
-                boxSizing: 'border-box'
-              }}
-            />
-
-            {/* Radio Buttons for Mode Selection */}
-            <div style={{ 
-              marginBottom: '15px',
-              display: 'flex',
-              gap: '20px',
-              alignItems: 'center'
-            }}>
-              {['encode', 'decode'].map(mode => (
-                <label key={mode} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  gap: '5px',
-                  cursor: 'pointer',
-                  color: '#495057'
-                }}>
-                  <input
-                    type="radio"
-                    value={mode}
-                    checked={base64Mode === mode}
-                    onChange={(e) => setBase64Mode(e.target.value)}
-                    style={{ cursor: 'pointer' }}
-                  />
-                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                </label>
-              ))}
-            </div>
-
-            <button
-              onClick={handleBase64Process}
-              style={{
-                padding: '8px 15px',
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s'
-              }}
-              onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
-              onMouseOut={(e) => e.target.style.backgroundColor = '#007bff'}
-            >
-              {base64Mode === 'encode' ? 'Encode' : 'Decode'}
-            </button>
-          </div>
-
-          {/* Output */}
-          <div style={{ position: 'relative' }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px',
-              color: '#495057',
-              fontWeight: '500'
-            }}>
-              Output
-            </label>
-            <div style={{
-              width: '100%',
-              padding: '10px',
-              backgroundColor: '#f8f9fa',
-              border: '1px solid #ced4da',
-              borderRadius: '4px',
-              height: '100px',
-              marginBottom: '10px',
-              boxSizing: 'border-box',
-              overflowY: 'auto',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-all'
-            }}>
-              {base64Output || 'Processed text will appear here'}
-            </div>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '10px'
-            }}>
-              <button
-                onClick={handleCopyBase64}
-                disabled={!base64Output}
-                style={{
-                  padding: '8px 15px',
-                  backgroundColor: base64Output ? '#28a745' : '#6c757d',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: base64Output ? 'pointer' : 'not-allowed',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = base64Output ? '#218838' : '#5a6268'}
-                onMouseOut={(e) => e.target.style.backgroundColor = base64Output ? '#28a745' : '#6c757d'}
-              >
-                Copy to Clipboard
-              </button>
-              {base64CopyStatus && (
-                <span style={{ 
-                  color: base64CopyStatus === 'Copied!' ? '#28a745' : '#dc3545',
-                  fontSize: '14px'
-                }}>
-                  {base64CopyStatus}
                 </span>
               )}
             </div>
