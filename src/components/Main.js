@@ -18,7 +18,6 @@ function Main() {
   const [useSpecialChars, setUseSpecialChars] = useState(false);
   const [generatedPasswords, setGeneratedPasswords] = useState('');
   const [passwordCopyStatus, setPasswordCopyStatus] = useState('');
-  const [usePrefix, setUsePrefix] = useState(false);
   const [prefixText, setPrefixText] = useState('');
   const [insertInputText, setInsertInputText] = useState('');
   const [insertOutputText, setInsertOutputText] = useState('');
@@ -101,7 +100,7 @@ function Main() {
 
   const generatePasswords = () => {
     // Validate prefix length
-    if (usePrefix && prefixText.length >= passwordLength) {
+    if (prefixText.length >= passwordLength) {
       setGeneratedPasswords('Error: Prefix length must be shorter than password length');
       return;
     }
@@ -126,8 +125,8 @@ function Main() {
     for (let i = 0; i < passwordCount; i++) {
       let password;
       do {
-        // Start with prefix if enabled
-        password = usePrefix ? prefixText : '';
+        // Start with prefix
+        password = prefixText;
         // Generate remaining characters
         const remainingLength = passwordLength - password.length;
         for (let j = 0; j < remainingLength; j++) {
@@ -778,26 +777,20 @@ function Main() {
               ))}
             </div>
 
-            {/* Add Starts with checkbox and textbox */}
+            {/* Prefix input with label */}
             <div style={{ marginBottom: '15px' }}>
               <label style={{ 
-                display: 'flex', 
-                alignItems: 'center',
-                gap: '5px',
-                cursor: 'pointer',
+                display: 'block', 
+                marginBottom: '8px',
                 color: '#495057',
-                marginBottom: '8px'
+                fontWeight: '500'
               }}>
-                <input
-                  type="checkbox"
-                  checked={usePrefix}
-                  onChange={(e) => setUsePrefix(e.target.checked)}
-                  style={{ cursor: 'pointer' }}
-                />
                 Starts with
               </label>
-              
-              {usePrefix && (
+              <div style={{ 
+                width: '100%',
+                boxSizing: 'border-box'
+              }}>
                 <input
                   type="text"
                   value={prefixText}
@@ -805,13 +798,13 @@ function Main() {
                   placeholder="Enter prefix"
                   style={{
                     width: '100%',
-                    padding: '8px',
+                    padding: '10px',
                     border: '1px solid #ced4da',
                     borderRadius: '4px',
-                    marginTop: '5px'
+                    boxSizing: 'border-box'
                   }}
                 />
-              )}
+              </div>
             </div>
 
             {/* Generate Button */}
