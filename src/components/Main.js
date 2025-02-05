@@ -10,7 +10,7 @@ function Main() {
   const [langInputText, setLangInputText] = useState('');
   const [langOutputText, setLangOutputText] = useState('');
   const [selectedLang, setSelectedLang] = useState('latin');
-  const [passwordCount, setPasswordCount] = useState(10);
+  const [passwordCount, setPasswordCount] = useState(20);
   const [passwordLength, setPasswordLength] = useState(10);
   const [useDigits, setUseDigits] = useState(true);
   const [useSmallLetters, setUseSmallLetters] = useState(true);
