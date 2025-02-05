@@ -20,6 +20,9 @@ function Main() {
   const [passwordCopyStatus, setPasswordCopyStatus] = useState('');
   const [usePrefix, setUsePrefix] = useState(false);
   const [prefixText, setPrefixText] = useState('');
+  const [insertInputText, setInsertInputText] = useState('');
+  const [insertOutputText, setInsertOutputText] = useState('');
+  const [insertCopyStatus, setInsertCopyStatus] = useState('');
 
   // Language character ranges
   const langRanges = {
@@ -149,6 +152,32 @@ function Main() {
     }
   };
 
+  const handleInsertProcess = () => {
+    // Split text into lines and filter out empty lines
+    const lines = insertInputText.split('\n').filter(line => line.trim() !== '');
+    
+    // Process each line
+    const processedLines = lines.map(line => {
+      // Split line by tabs and filter out empty strings
+      const words = line.split('\t').filter(word => word.length > 0);
+      // Wrap each word in single quotes and join with commas
+      return `(${words.map(word => `'${word.trim()}'`).join(', ')}),`;
+    });
+
+    // Join all lines with newlines
+    setInsertOutputText(processedLines.join('\n'));
+  };
+
+  const handleInsertCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(insertOutputText);
+      setInsertCopyStatus('Copied!');
+      setTimeout(() => setInsertCopyStatus(''), 2000);
+    } catch (err) {
+      setInsertCopyStatus('Failed to copy');
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Top Navigation Panel */}
@@ -242,7 +271,7 @@ function Main() {
         <h1 style={{ margin: 0 }}>Text Utils</h1>
       </div>
 
-      {/* Main Content Area with both frames */}
+      {/* Main Content Area with both Single Quoter sections */}
       <div style={{ 
         display: 'flex', 
         gap: '20px', 
@@ -250,7 +279,7 @@ function Main() {
         margin: '20px auto',
         width: 'fit-content'
       }}>
-        {/* Text Processing Section */}
+        {/* Single Quoter (for IN in SQL) Section */}
         <div style={{ 
           padding: '20px', 
           width: '600px',
@@ -409,7 +438,134 @@ function Main() {
           </div>
         </div>
 
-        {/* Language Check Frame */}
+        {/* Single Quoter (for INSERT in SQL) Section */}
+        <div style={{ 
+          padding: '20px', 
+          width: '600px',
+          border: '1px solid #ced4da',
+          borderRadius: '8px',
+          backgroundColor: 'white',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+        }}>
+          <h3 style={{ 
+            margin: '0 0 20px 0',
+            padding: '0 0 10px 0',
+            borderBottom: '1px solid #ced4da',
+            color: '#050533'
+          }}>
+            Single Quoter (for INSERT in SQL)
+          </h3>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '8px',
+              color: '#495057',
+              fontWeight: '500'
+            }}>
+              Input Text
+            </label>
+            <textarea
+              value={insertInputText}
+              onChange={(e) => setInsertInputText(e.target.value)}
+              placeholder="Enter words separated by tabs (e.g., value1⇥value2⇥value3)"
+              style={{
+                width: '100%',
+                padding: '10px',
+                height: '100px',
+                borderRadius: '4px',
+                border: '1px solid #ced4da',
+                marginBottom: '10px',
+                resize: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
+
+            <button
+              onClick={handleInsertProcess}
+              style={{
+                padding: '8px 15px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#007bff'}
+            >
+              Process Text
+            </button>
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '8px',
+              color: '#495057',
+              fontWeight: '500'
+            }}>
+              Output Text
+            </label>
+            <div style={{
+              width: '100%',
+              padding: '10px',
+              backgroundColor: '#f8f9fa',
+              border: '1px solid #ced4da',
+              borderRadius: '4px',
+              height: '100px',
+              marginBottom: '10px',
+              boxSizing: 'border-box',
+              overflowY: 'auto',
+              whiteSpace: 'pre-wrap'
+            }}>
+              {insertOutputText || 'Processed text will appear here'}
+            </div>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '10px'
+            }}>
+              <button
+                onClick={handleInsertCopy}
+                disabled={!insertOutputText}
+                style={{
+                  padding: '8px 15px',
+                  backgroundColor: insertOutputText ? '#28a745' : '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: insertOutputText ? 'pointer' : 'not-allowed',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = insertOutputText ? '#218838' : '#5a6268'}
+                onMouseOut={(e) => e.target.style.backgroundColor = insertOutputText ? '#28a745' : '#6c757d'}
+              >
+                Copy to Clipboard
+              </button>
+              {insertCopyStatus && (
+                <span style={{ 
+                  color: insertCopyStatus === 'Copied!' ? '#28a745' : '#dc3545',
+                  fontSize: '14px'
+                }}>
+                  {insertCopyStatus}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Language Check and Password Generator row */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '20px', 
+        justifyContent: 'center',
+        margin: '20px auto',
+        width: 'fit-content'
+      }}>
+        {/* Language Check Section */}
         <div style={{ 
           padding: '20px', 
           width: '600px',
@@ -524,16 +680,7 @@ function Main() {
             />
           </div>
         </div>
-      </div>
 
-      {/* Container for Password Generator */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '20px', 
-        justifyContent: 'center',
-        margin: '20px auto',
-        width: 'fit-content'
-      }}>
         {/* Password Generator Section */}
         <div style={{ 
           padding: '20px', 
