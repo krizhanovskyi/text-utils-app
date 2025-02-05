@@ -18,6 +18,8 @@ function Main() {
   const [useSpecialChars, setUseSpecialChars] = useState(false);
   const [generatedPasswords, setGeneratedPasswords] = useState('');
   const [passwordCopyStatus, setPasswordCopyStatus] = useState('');
+  const [usePrefix, setUsePrefix] = useState(false);
+  const [prefixText, setPrefixText] = useState('');
 
   // Language character ranges
   const langRanges = {
@@ -95,6 +97,12 @@ function Main() {
   };
 
   const generatePasswords = () => {
+    // Validate prefix length
+    if (usePrefix && prefixText.length >= passwordLength) {
+      setGeneratedPasswords('Error: Prefix length must be shorter than password length');
+      return;
+    }
+
     const digits = '0123456789';
     const smallLetters = 'abcdefghijklmnopqrstuvwxyz';
     const capitalLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -115,8 +123,11 @@ function Main() {
     for (let i = 0; i < passwordCount; i++) {
       let password;
       do {
-        password = '';
-        for (let j = 0; j < passwordLength; j++) {
+        // Start with prefix if enabled
+        password = usePrefix ? prefixText : '';
+        // Generate remaining characters
+        const remainingLength = passwordLength - password.length;
+        for (let j = 0; j < remainingLength; j++) {
           const randomIndex = Math.floor(Math.random() * charset.length);
           password += charset[randomIndex];
         }
@@ -254,7 +265,7 @@ function Main() {
             borderBottom: '1px solid #ced4da',
             color: '#050533'
           }}>
-            Single Quoter
+            Single Quoter (for IN in SQL)
           </h3>
           <div style={{ marginBottom: '20px' }}>
 
@@ -595,7 +606,7 @@ function Main() {
             </div>
 
             {/* Checkboxes */}
-            <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
+            <div style={{ display: 'flex', gap: '20px', marginBottom: '15px', flexWrap: 'wrap' }}>
               {[
                 { label: 'Digits', state: useDigits, setState: setUseDigits },
                 { label: 'Small Letters', state: useSmallLetters, setState: setUseSmallLetters },
@@ -618,6 +629,42 @@ function Main() {
                   {label}
                 </label>
               ))}
+            </div>
+
+            {/* Add Starts with checkbox and textbox */}
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                gap: '5px',
+                cursor: 'pointer',
+                color: '#495057',
+                marginBottom: '8px'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={usePrefix}
+                  onChange={(e) => setUsePrefix(e.target.checked)}
+                  style={{ cursor: 'pointer' }}
+                />
+                Starts with
+              </label>
+              
+              {usePrefix && (
+                <input
+                  type="text"
+                  value={prefixText}
+                  onChange={(e) => setPrefixText(e.target.value)}
+                  placeholder="Enter prefix"
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: '1px solid #ced4da',
+                    borderRadius: '4px',
+                    marginTop: '5px'
+                  }}
+                />
+              )}
             </div>
 
             {/* Generate Button */}
