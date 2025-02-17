@@ -39,26 +39,39 @@ function Matrix() {
       }).join('\n');
       setListOutput(output);
 
-      // Create Excel file
-      const ws = XLSX.utils.json_to_sheet(list);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "List");
-      XLSX.writeFile(wb, "matrix_to_list.xlsx");
-
     } catch (err) {
       setError('Error processing the matrix. Please check the input format.');
     }
   };
 
-  /* const handleCopyToClipboard1 = () => {
-    navigator.clipboard.writeText(listOutput)
-      .then(() => {
-        alert('Output copied to clipboard!');
-      })
-      .catch(err => {
-        console.error('Failed to copy: ', err);
-      });
-  }; */
+  const handleDownload = () => {
+    const rows = matrixInput.trim().split('\n').map(row => row.split('\t'));
+    const colHeaders = rows[0]; // First row as column headers
+    const list = [];
+
+    // Iterate through the matrix starting from the second row
+    for (let i = 1; i < rows.length; i++) {
+      for (let j = 1; j < rows[i].length; j++) {
+        if (rows[i][j]) { // Check if there's a value at the intersection
+          const item = {
+            Row: colHeaders[j - 1], // Use the column header for the row value
+            Column: rows[i][0] // Use the first column as the row identifier
+          };
+          if (includeValues) {
+            item.Value = rows[i][j]; // Include value if checkbox is checked
+          }
+          list.push(item);
+        }
+      }
+    }
+
+    // Create Excel file
+    const ws = XLSX.utils.json_to_sheet(list);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "List");
+    XLSX.writeFile(wb, "matrix_to_list.xlsx");
+  };
+
   const handleCopyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(listOutput);
@@ -262,6 +275,23 @@ function Matrix() {
             >
               Process Matrix
             </button>
+            <button
+              onClick={handleDownload}
+              style={{
+                padding: '8px 15px',
+                backgroundColor: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                marginLeft: '10px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#218838'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#28a745'}
+            >
+              Download
+            </button>
           </div>
 
           {/* Output Section */}
@@ -293,24 +323,24 @@ function Matrix() {
               alignItems: 'center', 
               gap: '10px'
             }}>
-            <button
-              onClick={handleCopyToClipboard}
-              disabled={!listOutput}
-              style={{
-                padding: '8px 15px',
+              <button
+                onClick={handleCopyToClipboard}
+                disabled={!listOutput}
+                style={{
+                  padding: '8px 15px',
                   backgroundColor: listOutput ? '#28a745' : '#6c757d',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: listOutput ? 'pointer' : 'not-allowed',
                   transition: 'background-color 0.2s'
-              }}
-              onMouseOver={(e) => e.target.style.backgroundColor = listOutput ? '#218838' : '#5a6268'}
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = listOutput ? '#218838' : '#5a6268'}
                 onMouseOut={(e) => e.target.style.backgroundColor = listOutput ? '#28a745' : '#6c757d'}
-            >
-              Copy to Clipboard
-            </button>
-            {copyStatus && (
+              >
+                Copy to Clipboard
+              </button>
+              {copyStatus && (
                 <span style={{ 
                   color: copyStatus === 'Copied!' ? '#28a745' : '#dc3545',
                   fontSize: '14px'
@@ -318,7 +348,7 @@ function Matrix() {
                   {copyStatus}
                 </span>
               )}
-              </div>
+            </div>
           </div>
         </div>
       </div>
