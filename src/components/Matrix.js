@@ -187,7 +187,7 @@ function MatrixToList() {
             <textarea
               value={matrixInput}
               onChange={(e) => setMatrixInput(e.target.value)}
-              placeholder="Paste your matrix here (tab-separated)"
+              placeholder="Paste your matrix here (tab-separated, as example from Excel)"
               style={{
                 width: '100%',
                 padding: '10px',
