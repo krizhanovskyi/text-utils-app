@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 
-function MatrixToList() {
+function Matrix() {
   const navigate = useNavigate();
   const [matrixInput, setMatrixInput] = useState('');
   const [listOutput, setListOutput] = useState('');
@@ -157,7 +157,7 @@ function MatrixToList() {
         marginRight: 'auto',
         paddingBottom: '10px'
       }}>
-        <h1 style={{ margin: 0 }}>Matrix to List</h1>
+        <h1 style={{ margin: 0 }}>Matrix operations</h1>
       </div>
 
       {/* Matrix Section */}
@@ -175,6 +175,14 @@ function MatrixToList() {
           backgroundColor: 'white',
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}>
+          <h3 style={{ 
+            margin: '0 0 20px 0',
+            padding: '0 0 10px 0',
+            borderBottom: '1px solid #ced4da',
+            color: '#050533'
+          }}>
+            Matrix to List
+          </h3>
           <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
@@ -267,4 +275,4 @@ function MatrixToList() {
   );
 }
 
-export default MatrixToList; 
+export default Matrix; 
