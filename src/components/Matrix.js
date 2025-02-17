@@ -7,6 +7,7 @@ function MatrixToList() {
   const [matrixInput, setMatrixInput] = useState('');
   const [listOutput, setListOutput] = useState('');
   const [error, setError] = useState('');
+  const [includeValues, setIncludeValues] = useState(true);
 
   const handleProcessMatrix = () => {
     setError('');
@@ -19,17 +20,22 @@ function MatrixToList() {
       for (let i = 1; i < rows.length; i++) {
         for (let j = 1; j < rows[i].length; j++) {
           if (rows[i][j]) { // Check if there's a value at the intersection
-            list.push({
+            const item = {
               Row: colHeaders[j - 1], // Use the column header for the row value
-              Column: rows[i][0], // Use the first column as the row identifier
-              Value: rows[i][j]
-            });
+              Column: rows[i][0] // Use the first column as the row identifier
+            };
+            if (includeValues) {
+              item.Value = rows[i][j]; // Include value if checkbox is checked
+            }
+            list.push(item);
           }
         }
       }
 
       // Convert list to a string for display
-      const output = list.map(item => `${item.Row}  ${item.Column}  ${item.Value}`).join('\n');
+      const output = list.map(item => {
+        return includeValues ? `${item.Row}  ${item.Column}  ${item.Value}` : `${item.Row}  ${item.Column}`;
+      }).join('\n');
       setListOutput(output);
 
       // Create Excel file
@@ -129,8 +135,7 @@ function MatrixToList() {
               backgroundColor: '#050533',
               borderRadius: '4px',
               cursor: 'pointer'
-            }}
-            >
+            }}>
               Matrix
             </div>
           </div>
@@ -203,6 +208,16 @@ function MatrixToList() {
                 {error}
               </div>
             )}
+            <div style={{ marginBottom: '10px' }}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={includeValues}
+                  onChange={(e) => setIncludeValues(e.target.checked)}
+                />
+                Include values
+              </label>
+            </div>
             <button
               onClick={handleProcessMatrix}
               style={{
