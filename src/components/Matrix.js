@@ -8,6 +8,7 @@ function Matrix() {
   const [listOutput, setListOutput] = useState('');
   const [error, setError] = useState('');
   const [includeValues, setIncludeValues] = useState(true);
+  const [copyStatus, setCopyStatus] = useState('');
 
   const handleProcessMatrix = () => {
     setError('');
@@ -34,7 +35,7 @@ function Matrix() {
 
       // Convert list to a string for display
       const output = list.map(item => {
-        return includeValues ? `${item.Row}  ${item.Column}  ${item.Value}` : `${item.Row}  ${item.Column}`;
+        return includeValues ? `${item.Row}\t${item.Column}\t${item.Value}` : `${item.Row}\t${item.Column}`;
       }).join('\n');
       setListOutput(output);
 
@@ -46,6 +47,25 @@ function Matrix() {
 
     } catch (err) {
       setError('Error processing the matrix. Please check the input format.');
+    }
+  };
+
+  /* const handleCopyToClipboard1 = () => {
+    navigator.clipboard.writeText(listOutput)
+      .then(() => {
+        alert('Output copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Failed to copy: ', err);
+      });
+  }; */
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(listOutput);
+      setCopyStatus('Copied!');
+      setTimeout(() => setCopyStatus(''), 2000); // Clear status after 2 seconds
+    } catch (err) {
+      setCopyStatus('Failed to copy');
     }
   };
 
@@ -157,7 +177,7 @@ function Matrix() {
         marginRight: 'auto',
         paddingBottom: '10px'
       }}>
-        <h1 style={{ margin: 0 }}>Matrix operations</h1>
+        <h1 style={{ margin: 0 }}>Matrix to List</h1>
       </div>
 
       {/* Matrix Section */}
@@ -268,6 +288,37 @@ function Matrix() {
             }}>
               {listOutput || 'Processed list will appear here'}
             </div>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '10px'
+            }}>
+            <button
+              onClick={handleCopyToClipboard}
+              disabled={!listOutput}
+              style={{
+                padding: '8px 15px',
+                  backgroundColor: listOutput ? '#28a745' : '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: listOutput ? 'pointer' : 'not-allowed',
+                  transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => e.target.style.backgroundColor = listOutput ? '#218838' : '#5a6268'}
+                onMouseOut={(e) => e.target.style.backgroundColor = listOutput ? '#28a745' : '#6c757d'}
+            >
+              Copy to Clipboard
+            </button>
+            {copyStatus && (
+                <span style={{ 
+                  color: copyStatus === 'Copied!' ? '#28a745' : '#dc3545',
+                  fontSize: '14px'
+                }}>
+                  {copyStatus}
+                </span>
+              )}
+              </div>
           </div>
         </div>
       </div>
