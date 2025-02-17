@@ -2,32 +2,44 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 
-function Json() {
+function MatrixToList() {
   const navigate = useNavigate();
-  const [jsonInput, setJsonInput] = useState('');
-  const [jsonError, setJsonError] = useState('');
+  const [matrixInput, setMatrixInput] = useState('');
+  const [listOutput, setListOutput] = useState('');
+  const [error, setError] = useState('');
 
-  const handleJsonToExcel = () => {
+  const handleProcessMatrix = () => {
+    setError('');
     try {
-      // Parse JSON input
-      const jsonData = JSON.parse(jsonInput);
-      
-      // Convert to array if single object
-      const dataArray = Array.isArray(jsonData) ? jsonData : [jsonData];
-      
-      // Create worksheet
-      const ws = XLSX.utils.json_to_sheet(dataArray);
-      
-      // Create workbook
+      const rows = matrixInput.trim().split('\n').map(row => row.split('\t'));
+      const colHeaders = rows[0]; // First row as column headers
+      const list = [];
+
+      // Iterate through the matrix starting from the second row
+      for (let i = 1; i < rows.length; i++) {
+        for (let j = 1; j < rows[i].length; j++) {
+          if (rows[i][j]) { // Check if there's a value at the intersection
+            list.push({
+              Row: colHeaders[j - 1], // Use the column header for the row value
+              Column: rows[i][0], // Use the first column as the row identifier
+              Value: rows[i][j]
+            });
+          }
+        }
+      }
+
+      // Convert list to a string for display
+      const output = list.map(item => `${item.Row}  ${item.Column}  ${item.Value}`).join('\n');
+      setListOutput(output);
+
+      // Create Excel file
+      const ws = XLSX.utils.json_to_sheet(list);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-      
-      // Generate Excel file
-      XLSX.writeFile(wb, "converted_data.xlsx");
-      
-      setJsonError('');
-    } catch (error) {
-      setJsonError('Invalid JSON format');
+      XLSX.utils.book_append_sheet(wb, ws, "List");
+      XLSX.writeFile(wb, "matrix_to_list.xlsx");
+
+    } catch (err) {
+      setError('Error processing the matrix. Please check the input format.');
     }
   };
 
@@ -78,9 +90,19 @@ function Json() {
             </div>
             <div style={{
               padding: '8px 15px',
-              backgroundColor: '#050533',
-              borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+              color: 'black',
+              borderRadius: '4px'
+            }}
+            onClick={() => navigate('/json')}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#34495e';
+              e.target.style.color = 'white';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = 'black';
             }}>
               JSON to Excel
             </div>
@@ -104,20 +126,11 @@ function Json() {
             </div>
             <div style={{
               padding: '8px 15px',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-              color: 'black',
-              borderRadius: '4px'
+              backgroundColor: '#050533',
+              borderRadius: '4px',
+              cursor: 'pointer'
             }}
-            onClick={() => navigate('/matrix')}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor = '#34495e';
-              e.target.style.color = 'white';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-              e.target.style.color = 'black';
-            }}>
+            >
               Matrix
             </div>
           </div>
@@ -139,18 +152,18 @@ function Json() {
         marginRight: 'auto',
         paddingBottom: '10px'
       }}>
-        <h1 style={{ margin: 0 }}>JSON to Excel</h1>
+        <h1 style={{ margin: 0 }}>Matrix to List</h1>
       </div>
 
-      {/* JSON Section */}
-      <div style={{ 
-        display: 'flex', 
+      {/* Matrix Section */}
+      <div style={{
+        display: 'flex',
         justifyContent: 'center',
         margin: '20px auto',
         width: 'fit-content'
       }}>
-        <div style={{ 
-          padding: '20px', 
+        <div style={{
+          padding: '20px',
           width: '600px',
           border: '1px solid #ced4da',
           borderRadius: '8px',
@@ -158,60 +171,80 @@ function Json() {
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}>
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ 
-              display: 'block', 
+            <label style={{
+              display: 'block',
               marginBottom: '8px',
               color: '#495057',
               fontWeight: '500'
             }}>
-              Input JSON
+              Input Matrix
             </label>
             <textarea
-              value={jsonInput}
-              onChange={(e) => {
-                setJsonInput(e.target.value);
-                setJsonError('');
-              }}
-              placeholder="Paste your JSON here"
+              value={matrixInput}
+              onChange={(e) => setMatrixInput(e.target.value)}
+              placeholder="Paste your matrix here (tab-separated)"
               style={{
                 width: '100%',
                 padding: '10px',
                 height: '200px',
                 borderRadius: '4px',
-                border: jsonError ? '1px solid #dc3545' : '1px solid #ced4da',
+                border: '1px solid #ced4da',
                 marginBottom: '10px',
                 resize: 'none',
                 boxSizing: 'border-box'
               }}
             />
-            
-            {jsonError && (
-              <div style={{ 
+            {error && (
+              <div style={{
                 color: '#dc3545',
                 fontSize: '14px',
                 marginBottom: '10px'
               }}>
-                {jsonError}
+                {error}
               </div>
             )}
-
             <button
-              onClick={handleJsonToExcel}
-              disabled={!jsonInput}
+              onClick={handleProcessMatrix}
               style={{
                 padding: '8px 15px',
-                backgroundColor: jsonInput ? '#007bff' : '#6c757d',
+                backgroundColor: '#007bff',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: jsonInput ? 'pointer' : 'not-allowed',
+                cursor: 'pointer',
                 transition: 'background-color 0.2s'
               }}
-              onMouseOver={(e) => e.target.style.backgroundColor = jsonInput ? '#0056b3' : '#5a6268'}
-              onMouseOut={(e) => e.target.style.backgroundColor = jsonInput ? '#007bff' : '#6c757d'}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#007bff'}
             >
-              Convert to Excel
+              Process Matrix
             </button>
+          </div>
+
+          {/* Output Section */}
+          <div style={{ position: 'relative' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              color: '#495057',
+              fontWeight: '500'
+            }}>
+              Output List
+            </label>
+            <div style={{
+              width: '100%',
+              padding: '10px',
+              backgroundColor: '#f8f9fa',
+              border: '1px solid #ced4da',
+              borderRadius: '4px',
+              height: '100px',
+              marginBottom: '10px',
+              boxSizing: 'border-box',
+              overflowY: 'auto',
+              whiteSpace: 'pre-wrap'
+            }}>
+              {listOutput || 'Processed list will appear here'}
+            </div>
           </div>
         </div>
       </div>
@@ -219,4 +252,4 @@ function Json() {
   );
 }
 
-export default Json; 
+export default MatrixToList; 

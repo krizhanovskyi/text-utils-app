@@ -103,6 +103,24 @@ function Base64() {
             }}>
               Base64
             </div>
+            <div style={{
+              padding: '8px 15px',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+              color: 'black',
+              borderRadius: '4px'
+            }}
+            onClick={() => navigate('/matrix')}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#34495e';
+              e.target.style.color = 'white';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = 'black';
+            }}>
+              Matrix
+            </div>
           </div>
         </div>
 
