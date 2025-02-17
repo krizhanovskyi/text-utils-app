@@ -279,16 +279,16 @@ function Matrix() {
               onClick={handleDownload}
               style={{
                 padding: '8px 15px',
-                backgroundColor: '#28a745',
+                backgroundColor: listOutput ? '#28a745' : '#6c757d',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer',
+                cursor: listOutput ? 'pointer' : 'not-allowed',
                 marginLeft: '10px',
                 transition: 'background-color 0.2s'
               }}
-              onMouseOver={(e) => e.target.style.backgroundColor = '#218838'}
-              onMouseOut={(e) => e.target.style.backgroundColor = '#28a745'}
+              onMouseOver={(e) => e.target.style.backgroundColor = listOutput ? '#218838' : '#5a6268'}
+                onMouseOut={(e) => e.target.style.backgroundColor = listOutput ? '#28a745' : '#6c757d'}
             >
               Download
             </button>
