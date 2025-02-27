@@ -276,7 +276,7 @@ function Matrix() {
               Process Matrix
             </button>
             <button
-              onClick={handleDownload}
+              onClick={listOutput ? handleDownload : null}
               style={{
                 padding: '8px 15px',
                 backgroundColor: listOutput ? '#28a745' : '#6c757d',
